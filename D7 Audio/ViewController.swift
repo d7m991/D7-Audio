@@ -1,10 +1,3 @@
-//
-//  ViewController.swift
-//  D7 Audio
-//
-//  Created by abdul on 7/18/24.
-//
-
 import UIKit
 import AVFoundation
 
@@ -62,29 +55,25 @@ class ViewController: UIViewController {
         let inputNode = audioEngine.inputNode
         let inputFormat = inputNode.inputFormat(forBus: 0)
         
+        // Use the original stereo format
+        let stereoFormat = inputFormat
+
         audioEngine.attach(playerNode)
         audioEngine.attach(pitchEffect)
         audioEngine.attach(reverbEffect)
         audioEngine.attach(delayEffect)
         audioEngine.attach(mixerNode)
         
-        audioEngine.connect(playerNode, to: pitchEffect, format: inputFormat)
-        audioEngine.connect(pitchEffect, to: reverbEffect, format: inputFormat)
-        audioEngine.connect(reverbEffect, to: delayEffect, format: inputFormat)
-        audioEngine.connect(delayEffect, to: mixerNode, format: inputFormat)
-        audioEngine.connect(mixerNode, to: audioEngine.outputNode, format: inputFormat)
+        audioEngine.connect(playerNode, to: pitchEffect, format: stereoFormat)
+        audioEngine.connect(pitchEffect, to: reverbEffect, format: stereoFormat)
+        audioEngine.connect(reverbEffect, to: delayEffect, format: stereoFormat)
+        audioEngine.connect(delayEffect, to: mixerNode, format: stereoFormat)
+        audioEngine.connect(mixerNode, to: audioEngine.outputNode, format: stereoFormat)
 
-
-        inputNode.installTap(onBus: 0, bufferSize: 4410, format: inputFormat) { (buffer, when) in
+        inputNode.installTap(onBus: 0, bufferSize: 4410, format: stereoFormat) { (buffer, when) in
             self.playerNode.scheduleBuffer(buffer, completionHandler: nil)
         }
     }
-    func setAudioPanning(node: AVAudioStereoMixing, pan: Float) {
-        node.pan = pan
-    }
-
-    // Pan audio fully to the left
-
 
     func startAudioEngine() {
         do {
